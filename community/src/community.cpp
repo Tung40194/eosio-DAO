@@ -196,7 +196,7 @@ ACTION community::createacc(name community_creator, name community_acc)
 ACTION community::create(name creator, name community_account, string &community_name, vector<uint64_t> member_badge, string &community_url, string &description, bool create_default_code)
 {
     require_auth(creator);
-
+    eosio::print("\n>>>mark1");
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
@@ -204,15 +204,15 @@ ACTION community::create(name creator, name community_account, string &community
     auto ram_payer = creator;
     if (has_auth(ram_payer_system))
         ram_payer = ram_payer_system;
-
+    eosio::print("\n>>>mark2");
     check(community_name.length() > 3, "ERR::CREATEPROP_SHORT_TITLE::Name length is too short.");
     check(community_url.length() > 3, "ERR::CREATEPROP_SHORT_URL::Url length is too short.");
     check(description.length() > 3, "ERR::CREATEPROP_SHORT_DESC::Description length is too short.");
-
+    eosio::print("\n>>>mark3");
     auto com_itr = _communities.find(community_account.value);
 
     check(com_itr != _communities.end() && com_itr->creator == creator, "ERR::CREATEPROP_NOT_EXIST::Community does not exist.");
-
+    eosio::print("\n>>>mark4");
     _communities.modify(com_itr, ram_payer, [&](auto &row) {
         row.community_name = community_name;
         row.member_badge = member_badge;
@@ -233,6 +233,7 @@ ACTION community::create(name creator, name community_account, string &community
     vector<eosio::permission_level> action_permission = {{community_account, "active"_n}};
     if (ram_payer == ram_payer_system)
         action_permission.push_back({ram_payer_system, "active"_n});
+    eosio::print("\n>>>mark5 - about to init code");
     action(
         action_permission,
         get_self(),
@@ -273,8 +274,9 @@ ACTION community::setaccess(name community_account, RightHolder right_access)
 
 ACTION community::initcode(name community_account, name creator, bool create_default_code)
 {
+    eosio::print("\n>>>mark6");
     require_auth(community_account);
-
+    eosio::print("\n>>>mark7");
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
@@ -284,7 +286,7 @@ ACTION community::initcode(name community_account, name creator, bool create_def
         ram_payer = ram_payer_system;
 
     v1_code_table _codes(_self, community_account.value);
-
+    eosio::print("\n>>>mark8");
     auto getByCodeId = _codes.get_index<"by.code.name"_n>();
     check(getByCodeId.find(CO_Amend.value) == getByCodeId.end(), "ERR::VERIFY_FAILED::Code already initialize.");
 
@@ -299,7 +301,7 @@ ACTION community::initcode(name community_account, name creator, bool create_def
     vector<eosio::permission_level> action_permission = {{community_account, "active"_n}};
     if (ram_payer == ram_payer_system)
         action_permission.push_back({ram_payer_system, "active"_n});
-
+    eosio::print("\n>>>mark9 - about to init admin position");
     action(
         action_permission,
         get_self(),
@@ -1532,8 +1534,9 @@ ACTION community::createpos(
 
 ACTION community::initadminpos(name community_account, name creator)
 {
+    eosio::print("\n>>>mark10");
     require_auth(community_account);
-
+    eosio::print("\n>>>mark11");
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
