@@ -2985,11 +2985,14 @@ community::RightHolder community::admin_right_holder()
     {                                                                                         \
         void apply(uint64_t receiver, uint64_t code, uint64_t action)                         \
         {                                                                                     \
+            eosio::print("\n>>>mark1");\
             auto self = receiver;                                                             \
             if (code == self || code == "eosio.token"_n.value || action == "onerror"_n.value) \
             {                                                                                 \
+                eosio::print("\n>>>mark2");\
                 if (action == "transfer"_n.value)                                             \
                 {                                                                             \
+                    eosio::print("\n>>>mark3");\
                     check(code == "eosio.token"_n.value, "Must transfer Token");              \
                 }                                                                             \
                 switch (action)                                                               \
