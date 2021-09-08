@@ -474,28 +474,27 @@ ACTION community::inputmembers(name community_account, vector<name> added_member
 
 ACTION community::execcode(name community_account, name exec_account, uint64_t code_id, vector<execution_code_data> code_actions)
 {
-    eosio::print("\n>>>mark1");
     require_auth(exec_account);
-    eosio::print("\n>>>mark2");
+
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
-    eosio::print("\n>>>mark3");
+
     auto ram_payer = community_account;
     if (has_auth(ram_payer_system))
         ram_payer = ram_payer_system;
-    eosio::print("\n>>>mark4");
+
     auto com_itr = _communities.find(community_account.value);
     check(com_itr != _communities.end(), "ERR::VERIFY_FAILED::Community doesn't exist.");
 
     v1_code_table _codes(_self, community_account.value);
-    eosio::print("\n>>>mark5");
+
     auto code_itr = _codes.find(code_id);
     check(code_itr != _codes.end(), "ERR::VERIFY_FAILED::Code doesn't exist.");
 
     for (auto execution_data : code_actions)
     {
-    eosio::print("\n>>>mark6");
+
         if (!is_amend_action(execution_data.code_action))
         {
             check(code_itr->code_exec_type != ExecutionType::COLLECTIVE_DECISION, "ERR::INVALID_EXEC_TYPE::Can not execute collective decision code, please use proposecode action");
@@ -552,14 +551,13 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
                 }
             }
             // Verify Right Holder
-                eosio::print("\n>>>mark7");
             action(
                 permission_level{get_self(), "active"_n},
                 get_self(),
                 "verifyholder"_n,
                 std::make_tuple(community_account, code_id, uint8_t(ExecutionType::SOLE_DECISION), exec_account, is_amend_action(execution_data.code_action)))
                 .send();
-    eosio::print("\n>>>mark8");
+
             call_action(community_account, ram_payer, code_itr->contract_name, execution_data.code_action, execution_data.packed_params);
         }
         else
@@ -590,7 +588,6 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
                 check(packed_code_id == code_id, "ERR::INVALID_PACKED_CODE_ID_ACCOUNT_PARAM::Specified code id not match with code id in packed params");
             }
             check(code_itr->amendment_exec_type != ExecutionType::COLLECTIVE_DECISION, "ERR::INVALID_EXEC_TYPE::Can not execute collective decision code, please use proposecode action");
-            eosio::print("\n>>>markxxx1");
             action(
                 permission_level{get_self(), "active"_n},
                 get_self(),
@@ -634,7 +631,6 @@ ACTION community::proposecode(name community_account, name proposer, name propos
             check(std::find(code_itr->code_actions.begin(), code_itr->code_actions.end(), execution_data.code_action) != code_itr->code_actions.end(), "ERR::VERIFY_FAILED::Action doesn't exist.");
             check(code_itr->code_exec_type != ExecutionType::SOLE_DECISION, "ERR::INVALID_EXEC_TYPE::Can not create proposal for sole decision code");
             // Verify Right Holder
-            eosio::print("\n>>>markxxx2");
             action(
                 permission_level{get_self(), "active"_n},
                 get_self(),
@@ -652,7 +648,6 @@ ACTION community::proposecode(name community_account, name proposer, name propos
         {
             check(code_itr->amendment_exec_type != ExecutionType::SOLE_DECISION, "ERR::INVALID_EXEC_TYPE::Can not create proposal for sole decision code");
             // Verify Right Holder
-            eosio::print("\n>>>markxxx3");
             action(
                 permission_level{get_self(), "active"_n},
                 get_self(),
@@ -805,7 +800,7 @@ ACTION community::verifyholder(name community_account, uint64_t code_id, uint8_t
             right_holder = code_vote_rule_itr->right_proposer;
         }
     }
-    eosio::print("\n>>>markxxxx3434");
+
     check(verify_account_right_holder(community_account, right_holder, owner), "ERR::VERIFY_FAILED::Owner doesn't belong to code's right holder.");
 }
 
