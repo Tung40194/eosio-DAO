@@ -590,6 +590,7 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
                 check(packed_code_id == code_id, "ERR::INVALID_PACKED_CODE_ID_ACCOUNT_PARAM::Specified code id not match with code id in packed params");
             }
             check(code_itr->amendment_exec_type != ExecutionType::COLLECTIVE_DECISION, "ERR::INVALID_EXEC_TYPE::Can not execute collective decision code, please use proposecode action");
+            eosio::print("\n>>>markxxx1");
             action(
                 permission_level{get_self(), "active"_n},
                 get_self(),
@@ -633,6 +634,7 @@ ACTION community::proposecode(name community_account, name proposer, name propos
             check(std::find(code_itr->code_actions.begin(), code_itr->code_actions.end(), execution_data.code_action) != code_itr->code_actions.end(), "ERR::VERIFY_FAILED::Action doesn't exist.");
             check(code_itr->code_exec_type != ExecutionType::SOLE_DECISION, "ERR::INVALID_EXEC_TYPE::Can not create proposal for sole decision code");
             // Verify Right Holder
+            eosio::print("\n>>>markxxx2");
             action(
                 permission_level{get_self(), "active"_n},
                 get_self(),
@@ -650,6 +652,7 @@ ACTION community::proposecode(name community_account, name proposer, name propos
         {
             check(code_itr->amendment_exec_type != ExecutionType::SOLE_DECISION, "ERR::INVALID_EXEC_TYPE::Can not create proposal for sole decision code");
             // Verify Right Holder
+            eosio::print("\n>>>markxxx3");
             action(
                 permission_level{get_self(), "active"_n},
                 get_self(),
