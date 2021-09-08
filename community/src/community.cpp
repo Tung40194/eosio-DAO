@@ -2989,7 +2989,7 @@ community::RightHolder community::admin_right_holder()
             auto self = receiver;                                                             \
             if (code == self || code == "eosio.token"_n.value || action == "onerror"_n.value) \
             {                                                                                 \
-                eosio::print("\n>>>mark2");\
+                eosio::print("\n>>>mark2 - action name: ", name{action});\
                 if (action == "transfer"_n.value)                                             \
                 {                                                                             \
                     eosio::print("\n>>>mark3");\
