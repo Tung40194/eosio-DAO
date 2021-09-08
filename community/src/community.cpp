@@ -503,7 +503,6 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
             if (code_itr->contract_name == _self)
             {
                 eosio::print("\n>>>community::code_itr->contract_name: ", code_itr->contract_name);
-                eosio::print("\n>>>community::execution_data.code_action: ", execution_data.code_action);
                 datastream packed_params_datastream(&execution_data.packed_params[0], execution_data.packed_params.size());
                 name packed_community_account;
                 packed_params_datastream >> packed_community_account;
