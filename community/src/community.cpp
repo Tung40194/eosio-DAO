@@ -85,6 +85,7 @@ struct revokecert_params
 
 void community::transfer(name from, name to, asset quantity, string memo)
 {
+    eosio::print("\n>>>entering the transfer function");
     if (from == _self)
     {
         return;
