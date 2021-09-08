@@ -150,16 +150,17 @@ void community::transfer(name from, name to, asset quantity, string memo)
 
 ACTION community::createacc(name community_creator, name community_acc)
 {
+    eosio::print("\n>>>createacc::mark1");
     require_auth(get_self());
-
+    eosio::print("\n>>>createacc::mark2");
     auto com_itr = _communities.find(community_acc.value);
     check(com_itr == _communities.end(), "ERR::CREATEPROP_ALREADY_EXIST::Community already exists.");
-
+    eosio::print("\n>>>createacc::mark3");
     _communities.emplace(_self, [&](auto &row) {
         row.community_account = community_acc;
         row.creator = community_creator;
     });
-
+    eosio::print("\n>>>createacc::mark4");
     permission_level_weight account_permission_level = {permission_level{_self, "eosio.code"_n}, 1};
 
     authority owner_authority = {1, {}, {account_permission_level}, std::vector<wait_weight>()};
@@ -171,14 +172,14 @@ ACTION community::createacc(name community_creator, name community_acc)
     const uint64_t init_ram_amount = _config.init_ram_amount;
     const asset init_cpu = _config.init_cpu;
     const asset init_net = _config.init_net;
-
+    eosio::print("\n>>>createacc::mark5");
     action(
         permission_level{community_creator_name, "active"_n},
         "eosio"_n,
         "newaccount"_n,
         std::make_tuple(community_creator_name, community_acc, owner_authority, active_authority))
         .send();
-
+    eosio::print("\n>>>createacc::mark6");
     action(
         permission_level{_self, "active"_n},
         "eosio"_n,
