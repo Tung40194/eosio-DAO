@@ -474,27 +474,28 @@ ACTION community::inputmembers(name community_account, vector<name> added_member
 
 ACTION community::execcode(name community_account, name exec_account, uint64_t code_id, vector<execution_code_data> code_actions)
 {
+    eosio::print("\n>>>mark1");
     require_auth(exec_account);
-
+    eosio::print("\n>>>mark2");
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
-
+    eosio::print("\n>>>mark3");
     auto ram_payer = community_account;
     if (has_auth(ram_payer_system))
         ram_payer = ram_payer_system;
-
+    eosio::print("\n>>>mark4");
     auto com_itr = _communities.find(community_account.value);
     check(com_itr != _communities.end(), "ERR::VERIFY_FAILED::Community doesn't exist.");
 
     v1_code_table _codes(_self, community_account.value);
-
+    eosio::print("\n>>>mark5");
     auto code_itr = _codes.find(code_id);
     check(code_itr != _codes.end(), "ERR::VERIFY_FAILED::Code doesn't exist.");
 
     for (auto execution_data : code_actions)
     {
-
+    eosio::print("\n>>>mark6");
         if (!is_amend_action(execution_data.code_action))
         {
             check(code_itr->code_exec_type != ExecutionType::COLLECTIVE_DECISION, "ERR::INVALID_EXEC_TYPE::Can not execute collective decision code, please use proposecode action");
@@ -551,13 +552,14 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
                 }
             }
             // Verify Right Holder
+                eosio::print("\n>>>mark7");
             action(
                 permission_level{get_self(), "active"_n},
                 get_self(),
                 "verifyholder"_n,
                 std::make_tuple(community_account, code_id, uint8_t(ExecutionType::SOLE_DECISION), exec_account, is_amend_action(execution_data.code_action)))
                 .send();
-
+    eosio::print("\n>>>mark8");
             call_action(community_account, ram_payer, code_itr->contract_name, execution_data.code_action, execution_data.packed_params);
         }
         else
