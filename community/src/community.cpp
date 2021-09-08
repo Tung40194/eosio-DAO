@@ -513,6 +513,7 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
                 {
                     uint64_t packed_refer_id;
                     packed_params_datastream >> packed_refer_id;
+                    eosio::print("\n>>>community::mark1 - packed_refer_id: ", packed_refer_id);
                     check(code_itr->code_type.refer_id == packed_refer_id, "ERR:INVALID_BADGE_POSITION_CODE::Please use correct code to execute badge/position action");
                 }
                 else if (execution_data.code_action == "issuebadge"_n || execution_data.code_action == "revokebadge"_n)
@@ -531,6 +532,7 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
                             auto cb_data = unpack<issuebadge_params>(&action.data[0], action.data.size());
 
                             check(cb_data.issuer == community_account, "ERR::ISSUE_BADGE_PROPOSAL_INVALID::Issuer in issue badge proposal not the same with community account");
+                            eosio::print("\n>>>community::mark2");
                             check(cb_data.badge_id == code_itr->code_type.refer_id, "ERR:INVALID_BADGE_POSITION_CODE::Please use correct code to execute badge/position action");
                         }
 
@@ -543,6 +545,7 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
                             v1_cert_table _badges(_config.cryptobadge_contract_name, cb_data.owner.value);
                             auto owner_badge_itr = _badges.find(cb_data.cert_id);
                             check(owner_badge_itr != _badges.end(), "ERR::REVOKE_BADGE_PROPOSAL_INVALID::Certification does not exist");
+                            eosio::print("\n>>>community::mark3");
                             check(owner_badge_itr->badge_id == code_itr->code_type.refer_id, "ERR:INVALID_BADGE_POSITION_CODE::Please use correct code to execute badge/position action");
                         }
                     }
