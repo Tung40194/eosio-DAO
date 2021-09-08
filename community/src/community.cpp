@@ -805,7 +805,7 @@ ACTION community::verifyholder(name community_account, uint64_t code_id, uint8_t
             right_holder = code_vote_rule_itr->right_proposer;
         }
     }
-
+    eosio::print("\n>>>markxxxx3434");
     check(verify_account_right_holder(community_account, right_holder, owner), "ERR::VERIFY_FAILED::Owner doesn't belong to code's right holder.");
 }
 
