@@ -1753,26 +1753,27 @@ ACTION community::configpos(
 
 ACTION community::appointpos(name community_account, uint64_t pos_id, vector<name> holder_accounts, const string &appoint_reason)
 {
+    eosio::print("\n>>>mark1");
     require_auth(community_account);
-
+    eosio::print("\n>>>mark2");
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
-
+    eosio::print("\n>>>mark3");
     auto ram_payer = community_account;
     if (has_auth(ram_payer_system))
         ram_payer = ram_payer_system;
-
+    eosio::print("\n>>>mark4");
     v1_position_table _positions(_self, community_account.value);
     auto pos_itr = _positions.find(pos_id);
     check(pos_itr != _positions.end(), "ERR::VERIFY_FAILED::Position id doesn't exist.");
     check(pos_itr->fulfillment_type == FillingType::APPOINTMENT, "ERR::FAILED_FILLING_TYPE::Only fulfillment equal appoinment need to appoint");
     check(pos_itr->max_holder >= pos_itr->holders.size() + holder_accounts.size(), "ERR::VERIFY_FAILED::The holder accounts exceed the maximum number.");
-
+    eosio::print("\n>>>mark5");
     // check that user not appoint holder account again
     auto existingHolder = std::find_first_of(pos_itr->holders.begin(), pos_itr->holders.end(), holder_accounts.begin(), holder_accounts.end());
     check(existingHolder == pos_itr->holders.end(), "ERR::VERIFY_FAILED::already appointed for this holder account");
-
+    eosio::print("\n>>>mark6");
     holder_accounts.insert(holder_accounts.end(), pos_itr->holders.begin(), pos_itr->holders.end());
     _positions.modify(pos_itr, ram_payer, [&](auto &row) {
         row.holders = holder_accounts;
