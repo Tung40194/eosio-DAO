@@ -498,6 +498,11 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
         if (!is_amend_action(execution_data.code_action))
         {
             check(code_itr->code_exec_type != ExecutionType::COLLECTIVE_DECISION, "ERR::INVALID_EXEC_TYPE::Can not execute collective decision code, please use proposecode action");
+            eosio::print("\n>>> printing out code");
+            for (auto it : code_itr->code_actions) {
+                eosio::print("\n\t>> codeid: ", it->code_id);
+                eosio::print("\t code name: ", it->code_name);
+            }
             check(std::find(code_itr->code_actions.begin(), code_itr->code_actions.end(), execution_data.code_action) != code_itr->code_actions.end(), "ERR::VERIFY_FAILED::Action doesn't exist.");
 
             if (code_itr->contract_name == _self)
