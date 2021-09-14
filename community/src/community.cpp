@@ -85,7 +85,6 @@ struct revokecert_params
 
 void community::transfer(name from, name to, asset quantity, string memo)
 {
-    eosio::print("\n>>>entering the transfer function");
     if (from == _self)
     {
         return;
@@ -150,17 +149,13 @@ void community::transfer(name from, name to, asset quantity, string memo)
 
 ACTION community::createacc(name community_creator, name community_acc)
 {
-    eosio::print("\n>>>createacc::mark1");
     require_auth(get_self());
-    eosio::print("\n>>>createacc::mark2");
     auto com_itr = _communities.find(community_acc.value);
     check(com_itr == _communities.end(), "ERR::CREATEPROP_ALREADY_EXIST::Community already exists.");
-    eosio::print("\n>>>createacc::mark3");
     _communities.emplace(_self, [&](auto &row) {
         row.community_account = community_acc;
         row.creator = community_creator;
     });
-    eosio::print("\n>>>createacc::mark4");
     permission_level_weight account_permission_level = {permission_level{_self, "eosio.code"_n}, 1};
 
     authority owner_authority = {1, {}, {account_permission_level}, std::vector<wait_weight>()};
@@ -172,14 +167,12 @@ ACTION community::createacc(name community_creator, name community_acc)
     const uint64_t init_ram_amount = _config.init_ram_amount;
     const asset init_cpu = _config.init_cpu;
     const asset init_net = _config.init_net;
-    eosio::print("\n>>>createacc::mark5");
     action(
         permission_level{community_creator_name, "active"_n},
         "eosio"_n,
         "newaccount"_n,
         std::make_tuple(community_creator_name, community_acc, owner_authority, active_authority))
         .send();
-    eosio::print("\n>>>createacc::mark6");
     action(
         permission_level{_self, "active"_n},
         "eosio"_n,
@@ -198,7 +191,6 @@ ACTION community::createacc(name community_creator, name community_acc)
 ACTION community::create(name creator, name community_account, string &community_name, vector<uint64_t> member_badge, string &community_url, string &description, bool create_default_code)
 {
     require_auth(creator);
-    eosio::print("\n>>>mark1");
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
@@ -206,15 +198,12 @@ ACTION community::create(name creator, name community_account, string &community
     auto ram_payer = creator;
     if (has_auth(ram_payer_system))
         ram_payer = ram_payer_system;
-    eosio::print("\n>>>mark2");
     check(community_name.length() > 3, "ERR::CREATEPROP_SHORT_TITLE::Name length is too short.");
     check(community_url.length() > 3, "ERR::CREATEPROP_SHORT_URL::Url length is too short.");
     check(description.length() > 3, "ERR::CREATEPROP_SHORT_DESC::Description length is too short.");
-    eosio::print("\n>>>mark3");
     auto com_itr = _communities.find(community_account.value);
 
     check(com_itr != _communities.end() && com_itr->creator == creator, "ERR::CREATEPROP_NOT_EXIST::Community does not exist.");
-    eosio::print("\n>>>mark4");
     _communities.modify(com_itr, ram_payer, [&](auto &row) {
         row.community_name = community_name;
         row.member_badge = member_badge;
@@ -235,7 +224,6 @@ ACTION community::create(name creator, name community_account, string &community
     vector<eosio::permission_level> action_permission = {{community_account, "active"_n}};
     if (ram_payer == ram_payer_system)
         action_permission.push_back({ram_payer_system, "active"_n});
-    eosio::print("\n>>>mark5 - about to init code");
     action(
         action_permission,
         get_self(),
@@ -276,9 +264,7 @@ ACTION community::setaccess(name community_account, RightHolder right_access)
 
 ACTION community::initcode(name community_account, name creator, bool create_default_code)
 {
-    eosio::print("\n>>>mark6");
     require_auth(community_account);
-    eosio::print("\n>>>mark7");
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
@@ -288,7 +274,6 @@ ACTION community::initcode(name community_account, name creator, bool create_def
         ram_payer = ram_payer_system;
 
     v1_code_table _codes(_self, community_account.value);
-    eosio::print("\n>>>mark8");
     auto getByCodeId = _codes.get_index<"by.code.name"_n>();
     check(getByCodeId.find(CO_Amend.value) == getByCodeId.end(), "ERR::VERIFY_FAILED::Code already initialize.");
 
@@ -303,7 +288,6 @@ ACTION community::initcode(name community_account, name creator, bool create_def
     vector<eosio::permission_level> action_permission = {{community_account, "active"_n}};
     if (ram_payer == ram_payer_system)
         action_permission.push_back({ram_payer_system, "active"_n});
-    eosio::print("\n>>>mark9 - about to init admin position");
     action(
         action_permission,
         get_self(),
@@ -517,8 +501,6 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
                 {
                     uint64_t packed_refer_id;
                     packed_params_datastream >> packed_refer_id;
-                    eosio::print("\n>>>community::mark2 - code_itr->code_type.refer_id: ", code_itr->code_type.refer_id);
-                    eosio::print("\n>>>community::mark1 - packed_refer_id: ", packed_refer_id);
                     check(code_itr->code_type.refer_id == packed_refer_id, "ERR:INVALID_BADGE_POSITION_CODE::Please use correct code to execute badge/position action");
                 }
                 else if (execution_data.code_action == "issuebadge"_n || execution_data.code_action == "revokebadge"_n)
@@ -1536,9 +1518,7 @@ ACTION community::createpos(
 
 ACTION community::initadminpos(name community_account, name creator)
 {
-    eosio::print("\n>>>mark10");
     require_auth(community_account);
-    eosio::print("\n>>>mark11");
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
@@ -1760,27 +1740,21 @@ ACTION community::configpos(
 
 ACTION community::appointpos(name community_account, uint64_t pos_id, vector<name> holder_accounts, const string &appoint_reason)
 {
-    eosio::print("\n>>>mark1");
     require_auth(community_account);
-    eosio::print("\n>>>mark2");
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
-    eosio::print("\n>>>mark3");
     auto ram_payer = community_account;
     if (has_auth(ram_payer_system))
         ram_payer = ram_payer_system;
-    eosio::print("\n>>>mark4");
     v1_position_table _positions(_self, community_account.value);
     auto pos_itr = _positions.find(pos_id);
     check(pos_itr != _positions.end(), "ERR::VERIFY_FAILED::Position id doesn't exist.");
     check(pos_itr->fulfillment_type == FillingType::APPOINTMENT, "ERR::FAILED_FILLING_TYPE::Only fulfillment equal appoinment need to appoint");
     check(pos_itr->max_holder >= pos_itr->holders.size() + holder_accounts.size(), "ERR::VERIFY_FAILED::The holder accounts exceed the maximum number.");
-    eosio::print("\n>>>mark5");
     // check that user not appoint holder account again
     auto existingHolder = std::find_first_of(pos_itr->holders.begin(), pos_itr->holders.end(), holder_accounts.begin(), holder_accounts.end());
     check(existingHolder == pos_itr->holders.end(), "ERR::VERIFY_FAILED::already appointed for this holder account");
-    eosio::print("\n>>>mark6");
     holder_accounts.insert(holder_accounts.end(), pos_itr->holders.begin(), pos_itr->holders.end());
     _positions.modify(pos_itr, ram_payer, [&](auto &row) {
         row.holders = holder_accounts;
@@ -2986,14 +2960,11 @@ community::RightHolder community::admin_right_holder()
     {                                                                                         \
         void apply(uint64_t receiver, uint64_t code, uint64_t action)                         \
         {                                                                                     \
-            eosio::print("\n>>>mark1");\
             auto self = receiver;                                                             \
             if (code == self || code == "eosio.token"_n.value || action == "onerror"_n.value) \
             {                                                                                 \
-                eosio::print("\n>>>mark2 - action name: ", name{action});\
                 if (action == "transfer"_n.value)                                             \
                 {                                                                             \
-                    eosio::print("\n>>>mark3");\
                     check(code == "eosio.token"_n.value, "Must transfer Token");              \
                 }                                                                             \
                 switch (action)                                                               \
