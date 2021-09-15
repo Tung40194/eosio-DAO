@@ -489,11 +489,11 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
 
     v1_code_table _codes(_self, community_account.value);
 
-    print( ">>>community_account: ", community_account);
-    print( ">>>code_id: ", code_id);
+    print( "\n>>>community_account: ", community_account);
+    print( "\n>>>code_id: ", code_id);
     for (auto e : _codes) {
-        print( "e - code_id: ", e.code_id);
-        print( "e - code_nameame: ", e.code_name);
+        print( "\ne - code_id: ", e.code_id);
+        print( "\ne - code_nameame: ", e.code_name);
     }
 
     auto code_itr = _codes.find(code_id);
