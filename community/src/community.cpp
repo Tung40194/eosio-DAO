@@ -489,13 +489,6 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
 
     v1_code_table _codes(_self, community_account.value);
 
-    print( "\n>>>community_account: ", community_account);
-    print( "\n>>>code_id: ", code_id);
-    for (auto e : _codes) {
-        print( "\ne - code_id: ", e.code_id);
-        print( "\ne - code_nameame: ", e.code_name);
-    }
-
     auto code_itr = _codes.find(code_id);
     check(code_itr != _codes.end(), "ERR::VERIFY_FAILED::Code doesn't exist.");
 
