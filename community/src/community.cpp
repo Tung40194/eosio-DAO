@@ -233,6 +233,9 @@ ACTION community::create(name creator, name community_account, string &community
     vector<eosio::permission_level> action_permission = {{community_account, "active"_n}};
     if (ram_payer == ram_payer_system)
         action_permission.push_back({ram_payer_system, "active"_n});
+    eosio::print("before initcode on community account: ", community_account);
+    eosio::print("creator: ", creator);
+    eosio::print("create_default_code: ", create_default_code);
     action(
         action_permission,
         get_self(),
@@ -299,7 +302,7 @@ ACTION community::initcode(name community_account, name creator, bool create_def
     vector<eosio::permission_level> action_permission = {{community_account, "active"_n}};
     if (ram_payer == ram_payer_system)
         action_permission.push_back({ram_payer_system, "active"_n});
-
+    eosio::print("before init admin pos");
     action(
         action_permission,
         get_self(),
@@ -1548,7 +1551,7 @@ ACTION community::initadminpos(name community_account, name creator)
 
     auto getByCodeId = _codes.get_index<"by.code.name"_n>();
     auto positionCode = getByCodeId.find(PO_Create.value);
-
+    eosio::print("pos_admin_id: ", pos_admin_id);
     auto newPositionId = pos_admin_id;
 
     RightHolder _init_right_holder;
