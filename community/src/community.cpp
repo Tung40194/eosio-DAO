@@ -219,7 +219,7 @@ ACTION community::create(name creator, name community_account, string &community
         row.community_url = community_url;
         row.description = description;
     });
-    eosio::print(">>create::pushing in accession_account the creator: ", creator);
+    eosio::print("\n>>create::pushing in accession_account the creator: ", creator);
     vector<name> accession_account;
     accession_account.push_back(creator);
     v1_accession default_accession;
@@ -233,9 +233,9 @@ ACTION community::create(name creator, name community_account, string &community
     vector<eosio::permission_level> action_permission = {{community_account, "active"_n}};
     if (ram_payer == ram_payer_system)
         action_permission.push_back({ram_payer_system, "active"_n});
-    eosio::print(">>create::before initcode on community account: ", community_account);
-    eosio::print(">>create::creator: ", creator);
-    eosio::print(">>create::create_default_code: ", create_default_code);
+    eosio::print("\n>>create::before initcode on community account: ", community_account);
+    eosio::print("\n>>create::creator: ", creator);
+    eosio::print("\n>>create::create_default_code: ", create_default_code);
     action(
         action_permission,
         get_self(),
@@ -264,7 +264,7 @@ ACTION community::setaccess(name community_account, RightHolder right_access)
     auto it = std::find(right_access.accounts.begin(), right_access.accounts.end(), com_itr->creator);
     if (it == right_access.accounts.end())
     {
-        eosio::print(">>>setaccess::pushing back to accounts the creator: ", com_itr->creator);
+        eosio::print("\n>>>setaccess::pushing back to accounts the creator: ", com_itr->creator);
         right_access.accounts.push_back(com_itr->creator);
     }
 
@@ -296,7 +296,7 @@ ACTION community::initcode(name community_account, name creator, bool create_def
     v1_amend_sole_decision_table _amend_execution_rule(_self, community_account.value);
 
     RightHolder _createcode_right_holder;
-    eosio::print("initcode::pushing back creator: ", creator);
+    eosio::print("\n>>initcode::pushing back creator: ", creator);
     _createcode_right_holder.accounts.push_back(creator);
     vector<name> _init_actions;
     _init_actions.push_back("createcode"_n);
@@ -304,7 +304,7 @@ ACTION community::initcode(name community_account, name creator, bool create_def
     vector<eosio::permission_level> action_permission = {{community_account, "active"_n}};
     if (ram_payer == ram_payer_system)
         action_permission.push_back({ram_payer_system, "active"_n});
-    eosio::print(">>initcode::before init admin pos");
+    eosio::print("\n>>initcode::before init admin pos");
     action(
         action_permission,
         get_self(),
@@ -1438,7 +1438,7 @@ ACTION community::createpos(
     auto com_itr = _communities.find(community_account.value);
     check(com_itr != _communities.end(), "ERR::CREATEPROP_NOT_EXIST::Community does not exist.");
 
-    eosio::print(">>createpos::pushing back creator: ", creator);
+    eosio::print("\n>>createpos::pushing back creator: ", creator);
     _init_right_holder.accounts.push_back(creator);
 
     vector<name> code_actions;
@@ -1554,7 +1554,7 @@ ACTION community::initadminpos(name community_account, name creator)
 
     auto getByCodeId = _codes.get_index<"by.code.name"_n>();
     auto positionCode = getByCodeId.find(PO_Create.value);
-    eosio::print(">>initadminpos::pos_admin_id: ", pos_admin_id);
+    eosio::print("\n>>initadminpos::pos_admin_id: ", pos_admin_id);
     auto newPositionId = pos_admin_id;
 
     RightHolder _init_right_holder;
