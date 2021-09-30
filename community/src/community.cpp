@@ -224,7 +224,6 @@ ACTION community::create(name creator, name community_account, string &community
     accession_account.push_back(creator);
     v1_accession default_accession;
     default_accession.right_access.is_any_community_member = true;
-    eosio::print(">>>mark1\n");
     default_accession.right_access.accounts = accession_account;
     v1_accession_table _accession(_self, community_account.value);
     _accession.set(default_accession, ram_payer);
@@ -262,7 +261,6 @@ ACTION community::setaccess(name community_account, RightHolder right_access)
     auto it = std::find(right_access.accounts.begin(), right_access.accounts.end(), com_itr->creator);
     if (it == right_access.accounts.end())
     {
-        eosio::print(">>>mark2.1\n");
         right_access.accounts.push_back(com_itr->creator);
     }
 
@@ -294,7 +292,6 @@ ACTION community::initcode(name community_account, name creator, bool create_def
     v1_amend_sole_decision_table _amend_execution_rule(_self, community_account.value);
 
     RightHolder _createcode_right_holder;
-    eosio::print(">>>mark2.2\n");
     _createcode_right_holder.accounts.push_back(creator);
     vector<name> _init_actions;
     _init_actions.push_back("createcode"_n);
@@ -858,6 +855,7 @@ ACTION community::createcode(name community_account, name code_name, name contra
         auto co_amend_code_collective_decision = _code_vote_rule.find(co_amend_code->code_id);
         if (co_amend_code_collective_decision != _code_vote_rule.end())
         {
+            eosio::print(">>>setting pass_rule: ", co_amend_code_collective_decision->pass_rule);
             _amend_vote_rule.emplace(ram_payer, [&](auto &row) {
                 row.code_id = new_codes->code_id;
                 row.right_proposer = co_amend_code_collective_decision->right_proposer;
@@ -1436,7 +1434,6 @@ ACTION community::createpos(
     auto com_itr = _communities.find(community_account.value);
     check(com_itr != _communities.end(), "ERR::CREATEPROP_NOT_EXIST::Community does not exist.");
 
-    eosio::print(">>>mark2.3\n");
     _init_right_holder.accounts.push_back(creator);
 
     vector<name> code_actions;
