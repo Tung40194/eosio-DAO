@@ -804,7 +804,6 @@ ACTION community::verifyholder(name community_account, uint64_t code_id, uint8_t
 
 ACTION community::createcode(name community_account, name code_name, name contract_name, vector<name> code_actions)
 {
-    eosio::print(">>>createcode:: in function\n");
     require_auth(community_account);
 
     v1_global_table config(_self, _self.value);
@@ -850,15 +849,12 @@ ACTION community::createcode(name community_account, name code_name, name contra
             });
         }
     }
-    eosio::print(">>>createcode::co_amend_code->code_id: ", co_amend_code->code_id);
+
     if (co_amend_code->code_exec_type != ExecutionType::SOLE_DECISION)
     {
         auto co_amend_code_collective_decision = _code_vote_rule.find(co_amend_code->code_id);
-        eosio::print(">>>createcode::mark1");
         if (co_amend_code_collective_decision != _code_vote_rule.end())
         {
-            eosio::print(">>>createcode::mark2");
-            eosio::print(">>>setting pass_rule: ", co_amend_code_collective_decision->pass_rule);
             _amend_vote_rule.emplace(ram_payer, [&](auto &row) {
                 row.code_id = new_codes->code_id;
                 row.right_proposer = co_amend_code_collective_decision->right_proposer;
