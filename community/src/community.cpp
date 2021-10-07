@@ -805,7 +805,7 @@ ACTION community::verifyholder(name community_account, uint64_t code_id, uint8_t
 ACTION community::createcode(name community_account, name code_name, name contract_name, vector<name> code_actions)
 {
     require_auth(community_account);
-
+    eosio::print(">>>DB: mark1\n");
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
@@ -840,6 +840,7 @@ ACTION community::createcode(name community_account, name code_name, name contra
 
     if (co_amend_code->code_exec_type != ExecutionType::COLLECTIVE_DECISION)
     {
+        eosio::print(">>>DB: mark2\n");
         auto co_amend_code_sole_decision = _code_execution_rule.find(co_amend_code->code_id);
         if (co_amend_code_sole_decision != _code_execution_rule.end())
         {
@@ -852,6 +853,11 @@ ACTION community::createcode(name community_account, name code_name, name contra
 
     if (co_amend_code->code_exec_type != ExecutionType::SOLE_DECISION)
     {
+        eosio::print(">>>DB: mark3\n");
+        eosio::print(">>>DB: co_amend_code_collective_decision->pass_rule: ", co_amend_code_collective_decision->pass_rule);
+        eosio::print("\n");
+        eosio::print(">>>DB: co_amend_code_collective_decision->vote_duration: ", co_amend_code_collective_decision->vote_duration);
+        eosio::print("\n");
         auto co_amend_code_collective_decision = _code_vote_rule.find(co_amend_code->code_id);
         if (co_amend_code_collective_decision != _code_vote_rule.end())
         {
