@@ -854,13 +854,14 @@ ACTION community::createcode(name community_account, name code_name, name contra
     if (co_amend_code->code_exec_type != ExecutionType::SOLE_DECISION)
     {
         eosio::print(">>>DB: mark3\n");
-        eosio::print(">>>DB: co_amend_code_collective_decision->pass_rule: ", co_amend_code_collective_decision->pass_rule);
-        eosio::print("\n");
-        eosio::print(">>>DB: co_amend_code_collective_decision->vote_duration: ", co_amend_code_collective_decision->vote_duration);
-        eosio::print("\n");
         auto co_amend_code_collective_decision = _code_vote_rule.find(co_amend_code->code_id);
         if (co_amend_code_collective_decision != _code_vote_rule.end())
         {
+            eosio::print(">>>DB: mark4\n");
+            eosio::print(">>>DB: co_amend_code_collective_decision->pass_rule: ", co_amend_code_collective_decision->pass_rule);
+            eosio::print("\n");
+            eosio::print(">>>DB: co_amend_code_collective_decision->vote_duration: ", co_amend_code_collective_decision->vote_duration);
+            eosio::print("\n");
             _amend_vote_rule.emplace(ram_payer, [&](auto &row) {
                 row.code_id = new_codes->code_id;
                 row.right_proposer = co_amend_code_collective_decision->right_proposer;
