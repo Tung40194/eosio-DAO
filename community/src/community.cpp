@@ -829,7 +829,7 @@ ACTION community::createcode(name community_account, name code_name, name contra
 
     // save new code to the table
     eosio::print(">>>DB: mark2\n");
-    eosio::print(">>> DB: code size before: ", std::count(_codes.cbegin(),_codes.cend()));
+    eosio::print(">>> DB: code size before: ", std::distance(_codes.cbegin(),_codes.cend()));
     eosio::print("\n");
     auto new_codes = _codes.emplace(ram_payer, [&](auto &row) {
         row.code_id = _codes.available_primary_key();
@@ -841,7 +841,7 @@ ACTION community::createcode(name community_account, name code_name, name contra
         row.code_type = {NORMAL, 0};
     });
 
-    eosio::print(">>> DB: code size before: ", std::count(_codes.cbegin(),_codes.cend()));
+    eosio::print(">>> DB: code size before: ", std::distance(_codes.cbegin(),_codes.cend()));
     eosio::print("\n");
 
     if (co_amend_code->code_exec_type != ExecutionType::COLLECTIVE_DECISION)
