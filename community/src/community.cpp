@@ -494,9 +494,11 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
 
     for (auto execution_data : code_actions)
     {
-
+        eosio::print(">>>DB execution_data.code_action: ", execution_data.code_action);
+        eosio::print("\n");
         if (!is_amend_action(execution_data.code_action))
         {
+            eosio::print(">>>DB is not amend\n");
             check(code_itr->code_exec_type != ExecutionType::COLLECTIVE_DECISION, "ERR::INVALID_EXEC_TYPE::Can not execute collective decision code, please use proposecode action");
             check(std::find(code_itr->code_actions.begin(), code_itr->code_actions.end(), execution_data.code_action) != code_itr->code_actions.end(), "ERR::VERIFY_FAILED::Action doesn't exist.");
 
@@ -560,6 +562,7 @@ ACTION community::execcode(name community_account, name exec_account, uint64_t c
         }
         else
         {
+            eosio::print(">>>DB is amend\n");
             datastream packed_params_datastream(&execution_data.packed_params[0], execution_data.packed_params.size());
             name packed_community_account;
             bool is_verify_account = true, is_verify_code = true;
@@ -745,7 +748,7 @@ ACTION community::execproposal(name community_account, name proposal_name)
 ACTION community::verifyholder(name community_account, uint64_t code_id, uint8_t execution_type, name owner, bool is_ammend_holder)
 {
     require_auth(_self);
-
+    eosio::print(">>>DB verify holder action\n");
     auto com_itr = _communities.find(community_account.value);
     check(com_itr != _communities.end(), "ERR::COMMUNITY_NOT_EXIST::Community is not existed.");
 
@@ -758,8 +761,10 @@ ACTION community::verifyholder(name community_account, uint64_t code_id, uint8_t
 
     if (execution_type == ExecutionType::SOLE_DECISION)
     {
+        eosio::print("DB sole execution\n");
         if (is_ammend_holder)
         {
+            eosio::print("DB checking on v1_amend_sole_decision_table\n");
             v1_amend_sole_decision_table _amend_execution_rule(_self, community_account.value);
             auto amend_execution_rule_itr = _amend_execution_rule.find(code_id);
 
@@ -805,7 +810,7 @@ ACTION community::verifyholder(name community_account, uint64_t code_id, uint8_t
 ACTION community::createcode(name community_account, name code_name, name contract_name, vector<name> code_actions)
 {
     require_auth(community_account);
-    eosio::print(">>>DB: mark1\n");
+
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
@@ -828,9 +833,6 @@ ACTION community::createcode(name community_account, name code_name, name contra
     auto co_amend_code = getByCodeName.find(CO_Amend.value);
 
     // save new code to the table
-    eosio::print(">>>DB: mark2\n");
-    eosio::print(">>> DB: code size before: ", std::distance(_codes.cbegin(),_codes.cend()));
-    eosio::print("\n");
     auto new_codes = _codes.emplace(ram_payer, [&](auto &row) {
         row.code_id = _codes.available_primary_key();
         row.code_name = code_name;
@@ -841,12 +843,8 @@ ACTION community::createcode(name community_account, name code_name, name contra
         row.code_type = {NORMAL, 0};
     });
 
-    eosio::print(">>> DB: code size before: ", std::distance(_codes.cbegin(),_codes.cend()));
-    eosio::print("\n");
-
     if (co_amend_code->code_exec_type != ExecutionType::COLLECTIVE_DECISION)
     {
-        eosio::print(">>>DB: mark3\n");
         auto co_amend_code_sole_decision = _code_execution_rule.find(co_amend_code->code_id);
         if (co_amend_code_sole_decision != _code_execution_rule.end())
         {
@@ -859,15 +857,9 @@ ACTION community::createcode(name community_account, name code_name, name contra
 
     if (co_amend_code->code_exec_type != ExecutionType::SOLE_DECISION)
     {
-        eosio::print(">>>DB: mark4\n");
         auto co_amend_code_collective_decision = _code_vote_rule.find(co_amend_code->code_id);
         if (co_amend_code_collective_decision != _code_vote_rule.end())
         {
-            eosio::print(">>>DB: mark5\n");
-            eosio::print(">>>DB: co_amend_code_collective_decision->pass_rule: ", co_amend_code_collective_decision->pass_rule);
-            eosio::print("\n");
-            eosio::print(">>>DB: co_amend_code_collective_decision->vote_duration: ", co_amend_code_collective_decision->vote_duration);
-            eosio::print("\n");
             _amend_vote_rule.emplace(ram_payer, [&](auto &row) {
                 row.code_id = new_codes->code_id;
                 row.right_proposer = co_amend_code_collective_decision->right_proposer;
@@ -973,7 +965,7 @@ ACTION community::setexectype(name community_account, uint64_t code_id, uint8_t 
 ACTION community::setsoleexec(name community_account, uint64_t code_id, bool is_amend_code, RightHolder right_sole_executor)
 {
     require_auth(community_account);
-
+    eosio::print(">>>DB: set sole execution\n");
     v1_global_table config(_self, _self.value);
     _config = config.exists() ? config.get() : v1_global{};
     const name ram_payer_system = _config.ram_payer_name;
@@ -1011,6 +1003,7 @@ ACTION community::setsoleexec(name community_account, uint64_t code_id, bool is_
     }
     else
     {
+        eosio::print(">>>DB: is_amend_code is equal to 0, writing on v1_code_sole_decicion_table\n");
         v1_code_sole_decision_table _execution_rule(_self, community_account.value);
         // check(code_itr->code_exec_type != ExecutionType::COLLECTIVE_DECISION, "ERR::VERIFY_FAILED::Can not set execution rule for collective decision code");
 
@@ -1018,12 +1011,14 @@ ACTION community::setsoleexec(name community_account, uint64_t code_id, bool is_
 
         if (code_execution_rule_itr != _execution_rule.end())
         {
+            eosio::print("\t>>>DB: existing code\n");
             _execution_rule.modify(code_execution_rule_itr, ram_payer, [&](auto &row) {
                 row.right_executor = right_sole_executor;
             });
         }
         else
         {
+            eosio::print("\t>>>DB: new code\n");
             _execution_rule.emplace(ram_payer, [&](auto &row) {
                 row.code_id = code_id;
                 row.right_executor = right_sole_executor;
